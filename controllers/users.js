@@ -34,28 +34,25 @@ const updateUser = (req, res, next) => {
 };
 const createUser = (req, res, next) => {
   const { email, name, password } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => {
-      User.create({
-        email,
-        name,
-        password: hash,
-      })
-        .then(() => {
-          res.send('Вы успешно зарегистрировались!');
-        })
-        .catch(next);
+  bcrypt.hash(password, 10).then((hash) => {
+    User.create({
+      email,
+      name,
+      password: hash,
     })
-    .catch((err) => {
-      if (err.code === 11000) {
-        next(new Conflict('Этот пользователь уже зарегистрирован'));
-      } else if (err.name === 'ValidationError') {
-        next(new BadRequest('Некорректные данные при создание пользователя'));
-      } else {
-        next(err);
-      }
-    });
+      .then(() => {
+        res.send('Вы успешно зарегистрировались!');
+      })
+      .catch((err) => {
+        if (err.code === 11000) {
+          next(new Conflict('Этот пользователь уже зарегистрирован'));
+        } else if (err.name === 'ValidationError') {
+          next(new BadRequest('Некорректные данные при создание пользователя'));
+        } else {
+          next(err);
+        }
+      });
+  });
 };
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -68,7 +65,7 @@ const login = (req, res, next) => {
         .then((result) => {
           if (!result) {
             Promise.reject(
-              new AuthorizationError('Неверно введен логин или пароль1'),
+              new AuthorizationError('Неверно введен логин или пароль'),
             ).catch(next);
           } else {
             const token = jwt.sign({ _id: user._id }, JWT_SECRET, {

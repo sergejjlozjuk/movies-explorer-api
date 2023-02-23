@@ -1,8 +1,20 @@
 const authRouter = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const { createUser, login, signOut } = require('../controllers/users');
 
-authRouter.post('/signup', createUser);
-authRouter.post('/signin', login);
+authRouter.post('/signup', celebrate({
+  body: {
+    email: Joi.string().email().required(),
+    name: Joi.string().required(),
+    password: Joi.string().required(),
+  },
+}), createUser);
+authRouter.post('/signin', celebrate({
+  body: {
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  },
+}), login);
 authRouter.post('/signout', signOut);
 
 module.exports = {
