@@ -1,11 +1,64 @@
+const { Forbidden } = require('../errors/forbiddenerror');
+const { NotFound } = require('../errors/notfounderror');
+const Movies = require('../schemas/movies');
+
 const getMovies = (req, res, next) => {
-  next();
+  const { _id } = req.user;
+  Movies.find({ owner: _id })
+    .then((movies) => {
+      res.send(movies);
+    })
+    .catch(next);
 };
 const deleteMovie = (req, res, next) => {
-  next();
+  const movieId = req.params._id.replace(':', '');
+  Movies.findOne({ movieId })
+    .then((movie) => {
+      if (movie === null) {
+        return Promise.reject(new NotFound('Такого фильма не существует'));
+      }
+      if (movie.owner._id.toString() !== req.user._id) {
+        return Promise.reject(new Forbidden('Недостаточно прав'));
+      }
+      return Movies.findOneAndDelete({ movieId });
+    })
+    .then((movie) => {
+      res.send(movie);
+    })
+    .catch(next);
 };
 const createMovie = (req, res, next) => {
-  next();
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
+  Movies.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+    owner: req.user._id,
+  })
+    .then((movie) => {
+      res.status(201).send(movie);
+    })
+    .catch(next);
 };
 
 module.exports = {

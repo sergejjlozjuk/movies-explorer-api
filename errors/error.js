@@ -1,8 +1,13 @@
 const { AuthorizationError } = require('./authorizationerror');
+const { Forbidden } = require('./forbiddenerror');
 const { NotFound } = require('./notfounderror');
 
 const errorhandler = (err, req, res, next) => {
-  if (err instanceof NotFound || err instanceof AuthorizationError) {
+  if (
+    err instanceof NotFound
+    || err instanceof AuthorizationError
+    || err instanceof Forbidden
+  ) {
     res.status(err.status).send(err.message);
   } else {
     console.log(err);
@@ -14,4 +19,5 @@ module.exports = {
   errorhandler,
   NotFound,
   AuthorizationError,
+  Forbidden,
 };
