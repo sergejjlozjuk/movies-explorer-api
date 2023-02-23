@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { AuthorizationError } = require('../errors/authorizationerror');
+const { BadRequest } = require('../errors/badrequesterror');
+const { Conflict } = require('../errors/conflicterror');
 
 const { JWT_SECRET = 'dev' } = process.env;
 const User = require('../schemas/users');
@@ -45,7 +47,15 @@ const createUser = (req, res, next) => {
         })
         .catch(next);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new Conflict('Этот пользователь уже зарегистрирован'));
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequest('Некорректные данные при создание пользователя'));
+      } else {
+        next(err);
+      }
+    });
 };
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -58,7 +68,7 @@ const login = (req, res, next) => {
         .then((result) => {
           if (!result) {
             Promise.reject(
-              new AuthorizationError('Неверно введен логин или пароль1')
+              new AuthorizationError('Неверно введен логин или пароль1'),
             ).catch(next);
           } else {
             const token = jwt.sign({ _id: user._id }, JWT_SECRET, {

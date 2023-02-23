@@ -1,4 +1,6 @@
 const { AuthorizationError } = require('./authorizationerror');
+const { BadRequest } = require('./badrequesterror');
+const { Conflict } = require('./conflicterror');
 const { Forbidden } = require('./forbiddenerror');
 const { NotFound } = require('./notfounderror');
 
@@ -7,10 +9,15 @@ const errorhandler = (err, req, res, next) => {
     err instanceof NotFound
     || err instanceof AuthorizationError
     || err instanceof Forbidden
+    || err instanceof BadRequest
+    || err instanceof Conflict
   ) {
     res.status(err.status).send(err.message);
+  }
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
+    res.status(400).send({ message: err.message });
   } else {
-    console.log(err);
+    res.status(500).send({ message: 'Ошибка на сервере' });
   }
   next();
 };
@@ -20,4 +27,6 @@ module.exports = {
   NotFound,
   AuthorizationError,
   Forbidden,
+  BadRequest,
+  Conflict,
 };

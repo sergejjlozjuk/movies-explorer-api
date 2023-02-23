@@ -1,3 +1,4 @@
+const { BadRequest } = require('../errors/badrequesterror');
 const { Forbidden } = require('../errors/forbiddenerror');
 const { NotFound } = require('../errors/notfounderror');
 const Movies = require('../schemas/movies');
@@ -58,7 +59,13 @@ const createMovie = (req, res, next) => {
     .then((movie) => {
       res.status(201).send(movie);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Некорректные даные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
