@@ -1,3 +1,4 @@
+const { errorsMessage } = require('../constants/errorMessage');
 const { BadRequest } = require('../errors/badrequesterror');
 const { Forbidden } = require('../errors/forbiddenerror');
 const { NotFound } = require('../errors/notfounderror');
@@ -12,16 +13,16 @@ const getMovies = (req, res, next) => {
     .catch(next);
 };
 const deleteMovie = (req, res, next) => {
-  const movieId = req.params._id.replace(':', '');
-  Movies.findOne({ movieId })
+  const { movieId: _id } = req.params;
+  Movies.findById({ _id })
     .then((movie) => {
       if (movie === null) {
-        return Promise.reject(new NotFound('Такого фильма не существует'));
+        return Promise.reject(new NotFound(errorsMessage.notfounderror));
       }
       if (movie.owner._id.toString() !== req.user._id) {
-        return Promise.reject(new Forbidden('Недостаточно прав'));
+        return Promise.reject(new Forbidden(errorsMessage.forbidenerror));
       }
-      return Movies.findOneAndDelete({ movieId });
+      return Movies.findByIdAndDelete({ _id });
     })
     .then((movie) => {
       res.send(movie);
@@ -61,7 +62,7 @@ const createMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Некорректные даные'));
+        next(new BadRequest(errorsMessage.badrequest));
       } else {
         next(err);
       }

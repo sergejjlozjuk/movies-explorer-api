@@ -8,20 +8,20 @@ movieRouter.post('/', celebrate({
   body: {
     country: Joi.string().required(),
     director: Joi.string().required(),
-    duration: Joi.string().required(),
+    duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
     image: Joi.string().required().regex(regex.link),
     trailerLink: Joi.string().required().regex(regex.link),
     thumbnail: Joi.string().required().regex(regex.link),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   },
 }), createMovie);
-movieRouter.delete('/:_id', celebrate({
+movieRouter.delete('/:movieId', celebrate({
   params: {
-    _id: Joi.string().required(),
+    movieId: Joi.string().required().hex().length(24),
   },
 }), deleteMovie);
 
