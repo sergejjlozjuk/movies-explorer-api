@@ -85,7 +85,7 @@ const login = (req, res, next) => {
               expiresIn: '7d',
             });
             res.cookie('token', token, {
-              secure: false,
+              secure: true,
               httpOnly: true,
               sameSite: 'none',
             });
