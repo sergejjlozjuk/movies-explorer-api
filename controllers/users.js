@@ -99,7 +99,7 @@ const login = (req, res, next) => {
 };
 const signOut = (req, res, next) => {
   res.clearCookie('token', {
-    secure: false,
+    secure: true,
     httpOnly: true,
     sameSite: 'none',
   });
