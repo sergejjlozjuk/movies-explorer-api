@@ -13,8 +13,8 @@ const getMovies = (req, res, next) => {
     .catch(next);
 };
 const deleteMovie = (req, res, next) => {
-  const { movieId: _id } = req.params;
-  Movies.findById({ _id })
+  const { movieId } = req.params;
+  Movies.findOne({ movieId })
     .then((movie) => {
       if (movie === null) {
         return Promise.reject(new NotFound(errorsMessage.notfounderror));
@@ -22,7 +22,7 @@ const deleteMovie = (req, res, next) => {
       if (movie.owner._id.toString() !== req.user._id) {
         return Promise.reject(new Forbidden(errorsMessage.forbidenerror));
       }
-      return Movies.findByIdAndDelete({ _id });
+      return Movies.findOneAndDelete({ movieId });
     })
     .then((movie) => {
       res.send(movie);
