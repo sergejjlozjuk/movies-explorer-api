@@ -5,6 +5,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://mesto.sergejj.nomoredomainsclub.ru',
   'http://mesto.sergejj.nomoredomainsclub.ru',
+  'https://movies.sergejj.nomoredomains.work',
 ];
 
 function checkSource(req, res, next) {
